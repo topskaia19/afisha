@@ -9,22 +9,36 @@
 - PHP 8.1 или выше.
 - PostgreSQL 14 или выше.
 - Расширения PHP: `pdo_pgsql`, `mbstring`.
-- pgAdmin 4 или SQL Shell (для управления базой данных).
+- pgAdmin 4 или SQL Shell для управления базой данных.
 
 ### 1. Создание базы данных
 
 Откройте pgAdmin 4, подключитесь к серверу PostgreSQL и создайте базу данных с именем:
 
 ```sql
-afisha
+CREATE DATABASE afisha;
 ```
 
 ### 2. Настройка подключения
 
-Откройте файл `config/config.php` и укажите параметры подключения к PostgreSQL:
+В папке `config/` находится файл `config.example.php` с примером настроек подключения к PostgreSQL.
+
+Скопируйте его и создайте рядом файл с именем `config.local.php`.
+
+Структура папки:
+
+```text
+config/
+├── config.php
+├── config.example.php
+└── config.local.php
+```
+
+Откройте `config.local.php` и укажите собственные параметры подключения:
 
 ```php
 <?php
+
 return [
     'dsn' => 'pgsql:host=localhost;port=5432;dbname=afisha',
     'user' => 'postgres',
@@ -34,6 +48,10 @@ return [
 ```
 
 Замените `ВАШ_ПАРОЛЬ` на пароль пользователя PostgreSQL.
+
+**Важно:** файл `config.local.php` содержит конфиденциальные данные и исключён из Git через `.gitignore`. Не загружайте его в публичный репозиторий.
+
+Файл `config.php` автоматически загружает локальные настройки, если `config.local.php` существует.
 
 ### 3. Проверка расширений PHP
 
@@ -135,7 +153,7 @@ app/Controllers  Home, Auth, Event, Admin
 app/Views        шаблоны (layout.php + страницы)
 public/          index.php (единая точка входа), css, js
 database/        schema.sql, install.php
-config/          config.php
+config/          config.php, config.example.php, config.local.php
 ```
 
 Запрос → `public/index.php` → `Router` (проверка CSRF для POST) → контроллер → модель → `View`.
@@ -191,7 +209,7 @@ password_resets(
 - **Пароли:** `password_hash` / `password_verify`; требования — от 8 символов, буква и цифра.
 - **Сессии:** `HttpOnly`, `SameSite=Lax`, `session_regenerate_id` при входе, проверка роли на каждом защищённом маршруте (`Auth::requireAdmin`).
 - **Восстановление:** токены одноразовые, с TTL, в БД хранится хеш; ответ не раскрывает, существует ли email.
-- **База данных:** доступ осуществляется через PDO с использованием подготовленных запросов и отдельной конфигурации подключения.
+- **База данных:** доступ осуществляется через PDO с использованием подготовленных запросов и отдельной локальной конфигурации подключения.
 
 ## 6. Примеры использования
 
@@ -208,11 +226,7 @@ password_resets(
 /events?q=джаз&category=1&format=offline&price_max=300
 ```
 
-## 7. Контрольные вопросы
-
-*Добавьте ответы на вопросы преподавателя.*
-
-## 8. Источники
+## 7. Источники
 
 - PHP Manual: https://www.php.net/manual/ru/
 - PostgreSQL Documentation: https://www.postgresql.org/docs/
